@@ -131,12 +131,13 @@ Reuse VegiCoop's user-context and date/time-service patterns. User context inclu
 Use singular controller/resource names:
 
 ```text
-GET    /api/work-item/{id}
-POST   /api/work-item
-PUT    /api/work-item/{id}
-POST   /api/work-item/{id}/cancel
-POST   /api/work-item/search
-GET    /api/gardener
+GET    /work-item/{id}
+POST   /work-item
+PUT    /work-item/{id}
+POST   /work-item/{id}/cancel
+POST   /work-item/search
+GET    /gardener
+GET    /health
 ```
 
 Use `WorkItemController` and `GardenerController`. Search is POST deliberately because the contract contains arrays and may evolve. Controllers remain thin. Enable Swagger/OpenAPI.

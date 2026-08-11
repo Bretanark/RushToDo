@@ -36,6 +36,8 @@ The future SQL Project may not build with the plain .NET CLI because it uses SSD
 
 Integration tests use `RushToDo.Test`, but never publish or reset it automatically. Manually publish `RushTodo.Database/Test.publish.xml` when a blank database is wanted. The local connection string is in `RushTodo.IntegrationTests/appsettings.IntegrationTests.json`; builds may override it with the standard `ConnectionStrings__RushTodo` environment variable. Test setup idempotently inserts any missing deterministic `TestData` records. Tests treat those records as immutable, use CSV containment assertions to tolerate unrelated accumulated data, and create their own uniquely identifiable records for write scenarios.
 
+Running `RushTodo.Api` with the Development launch profile opens Swagger UI at `/swagger` for interactive API testing.
+
 ## Architecture Principles
 
 - SQL Server schema lives in the SQL Project and deploys through a DACPAC; EF migrations are not the authority.
