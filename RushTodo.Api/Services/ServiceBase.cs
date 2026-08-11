@@ -1,6 +1,7 @@
 using RushTodo.Api.Entities;
 using RushTodo.Api.Models;
 using RushTodo.Api.Repositories;
+using RushTodo.Api.Validators;
 
 namespace RushTodo.Api.Services;
 
@@ -58,7 +59,8 @@ public abstract class ServiceBase<TEntity, TModel, TRepository> : IServiceBase<T
     protected virtual bool IncludeInLookup(TEntity entity)
         => entity is not IDeletableEntity deletableEntity || !deletableEntity.IsDeleted;
 
-    protected virtual void Validate(TModel model) { }
+    protected void Validate(TModel model) => GetValidator(model)?.Assert();
+    protected virtual ValidatorBase<TModel>? GetValidator(TModel model) => null;
     protected abstract void Map(TModel model, TEntity entity);
     protected abstract TModel Map(TEntity entity);
 }

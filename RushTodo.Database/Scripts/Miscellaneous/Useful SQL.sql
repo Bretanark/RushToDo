@@ -1,12 +1,8 @@
 -- Set the recent-change window used by the diagnostic queries below.
-DECLARE @Since DATETIME2 = DATEADD(HOUR, -1, SYSUTCDATETIME())
+DECLARE @Since DATETIME2 = DATEADD(HOUR, -5, SYSUTCDATETIME())
 
 -- Show recently changed gardeners.
 SELECT * FROM dbo.Gardener gd WHERE gd.UpdateDateTime > @Since ORDER BY gd.UpdateDateTime DESC
-
--- Show recently changed work items.
-SELECT * FROM dbo.WorkItem wi WHERE wi.UpdateDateTime > @Since ORDER BY wi.UpdateDateTime DESC
-
 
 -- Show work items with their status and optional gardener names.
 SELECT
@@ -23,6 +19,7 @@ SELECT
 FROM dbo.WorkItem wi
 JOIN dbo.WorkItemStatus ws ON ws.WorkItemStatusId = wi.StatusId
 LEFT JOIN dbo.Gardener gd ON gd.GardenerId = wi.GardenerId
+WHERE wi.UpdateDateTime > @Since
 ORDER BY wi.ScheduledDate, wi.WorkItemId
 
 

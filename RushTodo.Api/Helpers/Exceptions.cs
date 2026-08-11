@@ -20,3 +20,9 @@ public class UniqueConstraintException : Exception
     public UniqueConstraintException(Exception innerException)
         : base("A record with the same unique value already exists.", innerException) { }
 }
+
+
+public class ValidationException : Exception
+{
+    public ValidationException(string message) : base(message) { }
+}

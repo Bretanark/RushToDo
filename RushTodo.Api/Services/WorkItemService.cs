@@ -1,6 +1,7 @@
 using RushTodo.Api.Entities;
 using RushTodo.Api.Models;
 using RushTodo.Api.Repositories;
+using RushTodo.Api.Validators;
 
 namespace RushTodo.Api.Services;
 
@@ -20,6 +21,8 @@ public class WorkItemService : ServiceBase<WorkItem, WorkItemModel, IWorkItemRep
         var workItems = await Repository.Search(parameters, cancellationToken);
         return workItems.Select(Map).ToArray();
     }
+
+    protected override WorkItemValidator GetValidator(WorkItemModel model) => new(model);
 
     protected override void Map(WorkItemModel model, WorkItem workItem)
     {

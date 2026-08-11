@@ -45,6 +45,7 @@ public class ApiExceptionMiddleware
         ConcurrencyException => new(StatusCodes.Status409Conflict, "Conflict", exception.Message),
         UniqueConstraintException => new(StatusCodes.Status409Conflict, "Conflict", exception.Message),
         NotFoundException => new(StatusCodes.Status404NotFound, "Not Found", exception.Message),
+        ValidationException => new(StatusCodes.Status400BadRequest, "Bad Request", exception.Message),
         _ => new(StatusCodes.Status500InternalServerError, "Internal Server Error", "An unexpected error occurred."),
     };
 

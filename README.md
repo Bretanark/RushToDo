@@ -12,7 +12,7 @@ RushTodo.UnitTests
 RushTodo.IntegrationTests
 ```
 
-The solution currently contains the Web API shell with EF Core persistence mapping, persisted entities, SQL Server database project, and documentation. Remaining projects will be added one focused increment at a time.
+The solution currently contains the Web API, SQL Server database project, unit tests, integration tests, and documentation. Remaining projects will be added one focused increment at a time.
 
 ## Start Here
 
@@ -44,6 +44,7 @@ Running `RushTodo.Api` with the Development launch profile opens Swagger UI at `
 - Post-deploy seed scripts contain required reference data only. Optional/bootstrap business data belongs in explicitly run scripts under `RushTodo.Database/Scripts/Upgrade`.
 - The API is a conventional C#/.NET HTTP boundary. Controllers are thin; services own business operations; repositories own EF persistence and caching.
 - Reuse the proven VeggieCoOp foundations: entity/model mapping, `ServiceBase`, `BaseRepository`/`StaticRepository`, transaction orchestration, auditing, validation, and optimistic concurrency.
+- Validators are model-bound, dependency-free concrete classes constructed by services. Do not add one-interface-per-validator DI ceremony.
 - `StaticRepository` caches untracked reference entities in `IMemoryCache`, retrieves a fresh tracked entity for writes, and refreshes cache entries only after a successful transaction commit. RushTodo has no tenant/site cache dimension.
 - Concrete keys are `WorkItemId` and `GardenerId`; shared entity/model abstractions expose `Id` and `UpdateDateTime` for generic infrastructure.
 - Small reference entities such as `EntityType` and `WorkItemStatus` inherit from `Enummy`. Like `Entity.Id`, their `int Id` is an unmapped alias over an explicit enum-typed mapped key such as `WorkItemStatusId`; this keeps generic lookup dictionaries simple without discarding domain typing. Enummy properties are read-only to application code, expose an explicitly named display property for queries/selectors, and do not carry irrelevant entity timestamps.
