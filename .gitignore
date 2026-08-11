@@ -1,0 +1,66 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+out/
+artifacts/
+.verify-build/
+.verify-tests/
+
+# User-specific IDE and editor files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.DotSettings.user
+
+# Visual Studio temporary files
+TestResults/
+*.VisualState.xml
+*.dbmdl
+*.jfm
+*.ncrunch*
+_NCrunch_*
+*.vsp
+*.vspx
+*.coverage
+*.coveragexml
+
+# .NET and NuGet
+project.lock.json
+project.assets.json
+packages/
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+
+# Logs and diagnostics
+*.log
+logs/
+*.dmp
+*.mdmp
+*.pid
+
+# OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Local environment files
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.Local.json
+
+# React/Vite generated files
+rush-todo-web/node_modules/
+rush-todo-web/dist/
+
+# Docker and tooling overrides
+docker-compose.override.yml
