@@ -1,9 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using RushTodo.Api.Repositories;
-using RushTodo.IntegrationTests.Helpers;
 
-namespace RushTodo.IntegrationTests.Tests;
+namespace RushTodo.IntegrationTests;
 
 [TestFixture]
 public class GardenerRepositoryTests

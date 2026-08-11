@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RushTodo.Api.Entities;
 using RushTodo.Api.Repositories;
 
-namespace RushTodo.IntegrationTests.TestData;
+namespace RushTodo.IntegrationTests;
 
 public class GardenerTestData
 {

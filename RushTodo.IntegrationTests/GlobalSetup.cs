@@ -29,7 +29,7 @@ public class GlobalSetup
         });
 
         await using var scope = Services.CreateAsyncScope();
-        await TestData.TestData.Seed(scope.ServiceProvider);
+        await TestData.Seed(scope.ServiceProvider);
     }
 
     [OneTimeTearDown]

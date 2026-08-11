@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text;
 using NUnit.Framework;
 
-namespace RushTodo.IntegrationTests.Helpers;
+namespace RushTodo.IntegrationTests;
 
 public static class CsvAssert
 {

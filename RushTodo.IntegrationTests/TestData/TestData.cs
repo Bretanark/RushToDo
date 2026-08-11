@@ -1,4 +1,4 @@
-namespace RushTodo.IntegrationTests.TestData;
+namespace RushTodo.IntegrationTests;
 
 public static class TestData
 {
