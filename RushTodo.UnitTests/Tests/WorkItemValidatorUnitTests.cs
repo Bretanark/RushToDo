@@ -7,7 +7,7 @@ using RushTodo.Api.Validators;
 namespace RushTodo.UnitTests;
 
 [TestFixture]
-public class WorkItemValidatorTests
+public class WorkItemValidatorUnitTests
 {
     [Test]
     public void TitleIsRequired()
