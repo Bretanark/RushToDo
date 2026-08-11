@@ -71,6 +71,7 @@ Open `C:\GitHub\RushToDo\rush-todo-web` directly in Visual Studio Code, then run
 - `UpdateDateTime` is a UTC `DATETIME2` optimistic-concurrency token. Reject stale writes centrally and translate them in API exception middleware to `409 Conflict`.
 - `DateOnly` is for business dates and maps to SQL `DATE`; genuine instants are UTC `DateTime` values from `IDateTimeService.UtcNow`.
 - A work item may be unassigned, so `GardenerId` is nullable. Cancellation is a WorkItem business operation and remains distinct from soft deletion.
+- `WorkItem.StatusId` is denormalized process state rather than a directly editable field. The service derives `New`/`Scheduled` from `ScheduledDate`; completion and cancellation actions populate their corresponding dates and terminal statuses.
 - Until authentication and authorization are implemented, auditing uses one seeded development `AppUser` with the stable ID `1`. Replace this with authenticated user provisioning when that work begins.
 - React is TypeScript/Vite with app-owned CSS and shared controls—not Bootstrap. UI code calls one API facade rather than scattering `fetch`.
 

@@ -120,21 +120,22 @@ public class WorkItemServiceTests : IntegrationTestBase<IWorkItemService>
         {
             Title = "WorkItemServiceTests SaveGetUpdate",
             Description = "Created by WorkItemServiceTests SaveGetUpdate",
-            StatusId = WorkItemStatusId.Scheduled,
             Address = "2 Integration Lane",
             GardenerId = TestData.Gardener.Mary.Id,
             ScheduledDate = new(2026, 8, 12),
         };
         var created = await Run(service => service.Save(model));
+        Assert.That(created.StatusId, Is.EqualTo(WorkItemStatusId.Scheduled));
 
         var read = await Run(service => service.Get(created.Id));
         read.Title = "WorkItemServiceTests SaveGetUpdate - Updated";
+        read.ScheduledDate = null;
         await Run(service => service.Save(read));
         var actual = await Run(service => service.Get(created.Id));
 
         const string expected = """
             Title,Description,StatusId,Address,GardenerId,ScheduledDate,CompletionDate,CancellationDate,IsDeleted
-            WorkItemServiceTests SaveGetUpdate - Updated,Created by WorkItemServiceTests SaveGetUpdate,Scheduled,2 Integration Lane,10002,2026-08-12,,,FALSE
+            WorkItemServiceTests SaveGetUpdate - Updated,Created by WorkItemServiceTests SaveGetUpdate,New,2 Integration Lane,10002,,,,FALSE
             """;
         CsvAssert.Contains(expected, [actual]);
         Assert.That(actual.UpdateDateTime, Is.GreaterThan(read.UpdateDateTime));

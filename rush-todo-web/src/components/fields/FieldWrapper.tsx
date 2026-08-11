@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { ValidatorBase } from '../../validators/ValidatorBase'
 import './FieldWrapper.css'
 
 type FieldWrapperProps = {
@@ -7,27 +8,42 @@ type FieldWrapperProps = {
   error?: string
   errorId?: string
   htmlFor: string
-  label: string
+  label?: string
+  validator?: ValidatorBase
 }
 
-function FieldWrapper({ children, className, error, errorId, htmlFor, label }: FieldWrapperProps) {
-  const cssClass = ['field', error ? 'field--invalid' : '', className ?? '']
+function FieldWrapper({
+  children,
+  className,
+  error,
+  errorId,
+  htmlFor,
+  label,
+  validator,
+}: FieldWrapperProps) {
+  if (validator?.isVisible === false) return null
+
+  const validation = error ?? validator?.validate()
+  const effectiveLabel = label ?? validator?.label
+  const cssClass = ['field', validation ? 'field--invalid' : '', className ?? '']
     .filter(Boolean)
     .join(' ')
 
   return (
     <div className={cssClass}>
       <label className="field__label" htmlFor={htmlFor}>
-        {label}
+        {effectiveLabel}
       </label>
 
-      <div className="field__control">{children}</div>
+      <div className="field__control">
+        {children}
 
-      {error && (
-        <span className="field__error" id={errorId}>
-          {error}
-        </span>
-      )}
+        {validation && (
+          <span className="field__error" id={errorId} role="tooltip">
+            {validation}
+          </span>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,0 +1,16 @@
+.date-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.date-field--clearable {
+  grid-template-columns: minmax(0, 1fr) 3rem;
+}
+
+.date-field--clearable .date-field__input {
+  border-radius: calc(var(--radius) / 2) 0 0 calc(var(--radius) / 2);
+}
+
+.date-field__clear {
+  border-radius: 0 calc(var(--radius) / 2) calc(var(--radius) / 2) 0;
+}

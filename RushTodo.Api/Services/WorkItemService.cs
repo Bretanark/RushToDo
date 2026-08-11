@@ -16,6 +16,12 @@ public class WorkItemService : ServiceBase<WorkItem, WorkItemModel, IWorkItemRep
     public WorkItemService(IWorkItemRepository workItemRepository, ITransactionService transactionService)
         : base(workItemRepository, transactionService) { }
 
+    public override Task<WorkItemModel> Save(WorkItemModel model, string? auditDescription = "")
+    {
+        model.StatusId = GetStatusId(model);
+        return base.Save(model, auditDescription);
+    }
+
     public async Task<WorkItemModel[]> Search(WorkItemSearchParameters parameters, CancellationToken cancellationToken = default)
     {
         var workItems = await Repository.Search(parameters, cancellationToken);
@@ -23,6 +29,13 @@ public class WorkItemService : ServiceBase<WorkItem, WorkItemModel, IWorkItemRep
     }
 
     protected override WorkItemValidator GetValidator(WorkItemModel model) => new(model);
+
+    private static WorkItemStatusId GetStatusId(WorkItemModel model)
+    {
+        if (model.CancellationDate.HasValue) return WorkItemStatusId.Cancelled;
+        if (model.CompletionDate.HasValue) return WorkItemStatusId.Done;
+        return model.ScheduledDate.HasValue ? WorkItemStatusId.Scheduled : WorkItemStatusId.New;
+    }
 
     protected override void Map(WorkItemModel model, WorkItem workItem)
     {

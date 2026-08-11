@@ -1,16 +1,18 @@
 import { useId } from 'react'
+import type { TextValidator } from '../../validators/ValidatorBase'
 import FieldWrapper from './FieldWrapper'
 import './TextAreaField.css'
 
 type TextAreaFieldProps = {
   className?: string
   error?: string
-  label: string
+  label?: string
   maxLength?: number
   name?: string
   onChange: (value: string) => void
   rows?: number
   value: string
+  validator?: TextValidator
 }
 
 function TextAreaField({
@@ -22,6 +24,7 @@ function TextAreaField({
   onChange,
   rows = 4,
   value,
+  validator,
 }: TextAreaFieldProps) {
   const generatedId = useId()
   const inputId = name ?? generatedId
@@ -34,13 +37,14 @@ function TextAreaField({
       errorId={errorId}
       htmlFor={inputId}
       label={label}
+      validator={validator}
     >
       <textarea
-        aria-describedby={error ? errorId : undefined}
-        aria-invalid={error ? true : undefined}
+        aria-describedby={(error ?? validator?.validate()) ? errorId : undefined}
+        aria-invalid={(error ?? validator?.validate()) ? true : undefined}
         className="field__input text-area-field__input"
         id={inputId}
-        maxLength={maxLength}
+        maxLength={maxLength ?? validator?.maxLength}
         name={name}
         onChange={(event) => onChange(event.target.value)}
         rows={rows}

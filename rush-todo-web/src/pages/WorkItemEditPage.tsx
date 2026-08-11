@@ -7,7 +7,7 @@ import DateField from '../components/fields/DateField'
 import GardenerField from '../components/fields/GardenerField'
 import TextAreaField from '../components/fields/TextAreaField'
 import TextField from '../components/fields/TextField'
-import WorkItemStatusField from '../components/fields/WorkItemStatusField'
+import WorkItemValidator from '../validators/WorkItemValidator'
 
 function WorkItemEditPage() {
   const [workItem, setWorkItem] = useState<WorkItemModel>({
@@ -21,18 +21,28 @@ function WorkItemEditPage() {
     cancellationDate: null,
     isDeleted: false,
   })
+  const validator = new WorkItemValidator(workItem)
 
   return (
     <PageFrame title="Add Work Item">
       <Panel title="Details">
+        
         <TextField
           autoComplete="off"
           className="field--full"
-          label="Title"
-          maxLength={255}
           name="title"
           onChange={(title) => setWorkItem((current) => ({ ...current, title }))}
           value={workItem.title}
+          validator={validator.title}
+        />
+
+        <TextField
+          autoComplete="street-address"
+          className="field--full"
+          name="address"
+          onChange={(address) => setWorkItem((current) => ({ ...current, address }))}
+          value={workItem.address}
+          validator={validator.address}
         />
 
         <GardenerField
@@ -40,35 +50,27 @@ function WorkItemEditPage() {
           value={workItem.gardenerId}
         />
 
-        <TextField
-          autoComplete="street-address"
-          className="field--full"
-          label="Address"
-          maxLength={255}
-          name="address"
-          onChange={(address) => setWorkItem((current) => ({ ...current, address }))}
-          value={workItem.address}
+        <DateField
+          name="scheduledDate"
+          onChange={(scheduledDate) =>
+            setWorkItem((current) => ({
+              ...current,
+              scheduledDate,
+              statusId: scheduledDate ? WorkItemStatusId.Scheduled : WorkItemStatusId.New,
+            }))
+          }
+          value={workItem.scheduledDate}
+          validator={validator.scheduledDate}
         />
 
         <TextAreaField
           className="field--full"
-          label="Description"
           name="description"
           onChange={(description) => setWorkItem((current) => ({ ...current, description }))}
           value={workItem.description ?? ''}
+          validator={validator.description}
         />
 
-        <WorkItemStatusField
-          onChange={(statusId) => setWorkItem((current) => ({ ...current, statusId }))}
-          value={workItem.statusId}
-        />
-
-        <DateField
-          label="Scheduled date"
-          name="scheduledDate"
-          onChange={(scheduledDate) => setWorkItem((current) => ({ ...current, scheduledDate }))}
-          value={workItem.scheduledDate}
-        />
       </Panel>
     </PageFrame>
   )

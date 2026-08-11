@@ -130,7 +130,7 @@ function AutocompleteField({
         {value !== null && (
           <button
             aria-label={`Clear ${label}`}
-            className="autocomplete__button autocomplete__clear"
+            className="field__button autocomplete__button autocomplete__clear"
             disabled={disabled || loading}
             onClick={() => {
               onChange(null)
@@ -145,7 +145,7 @@ function AutocompleteField({
 
         <button
           aria-label={isOpen && query === '' ? 'Hide options' : 'Show options'}
-          className="autocomplete__button"
+          className="field__button autocomplete__button"
           disabled={disabled || loading}
           onClick={() => {
             if (isOpen && query === '') {

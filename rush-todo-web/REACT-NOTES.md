@@ -52,19 +52,18 @@ App
     └── PageFrame
         └── Panel
             ├── TextField (Title)
-            ├── TextAreaField (Description)
             ├── TextField (Address)
-            ├── WorkItemStatusField
             ├── GardenerField
             │   └── AutocompleteField
-            ├── DateField (Scheduled)
-            ├── DateField (Completion)
-            └── DateField (Cancellation)
+            ├── TextAreaField (Description)
+            └── DateField (Scheduled)
 ```
 
 `WorkItemEditPage` owns the draft WorkItem in `useState`. Each `TextField` is controlled: it receives its current value and reports changes through `onChange`. The page creates a new state object for each change rather than mutating the existing object; React then renders the updated values.
 
 Shared field presentation belongs in `FieldWrapper`; input-specific behaviour belongs in controls such as `TextField`. Base styling is mobile-first: fields use one column and expand to two columns only when enough width is available.
+
+`WorkItemValidator` supplies field labels, limits, visibility and validation. Invalid controls have a red border; their validation tooltip appears on focus/tap or mouse hover. `StatusId` is not edited directly: setting or clearing `ScheduledDate` selects `Scheduled` or `New`, while later completion and cancellation actions own their terminal dates and statuses.
 
 `GardenerField` loads real lookup data through `Api.getGardeners()` and passes the resulting `LookupItem[]` to the generic `AutocompleteField`. During development, Vite proxies `/gardener` to the API running at `https://localhost:63240`, so the browser sees the request as same-origin and needs no CORS configuration.
 
