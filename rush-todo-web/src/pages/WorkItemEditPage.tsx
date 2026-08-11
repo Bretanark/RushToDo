@@ -1,94 +1,150 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Api from '../api/Api'
 import { WorkItemStatusId } from '../api/models'
 import type { WorkItemModel } from '../api/models'
 import Button from '../components/Button'
+import LinkButton from '../components/LinkButton'
 import PageFrame from '../components/PageFrame'
 import Panel from '../components/Panel'
 import DateField from '../components/fields/DateField'
 import GardenerField from '../components/fields/GardenerField'
 import TextAreaField from '../components/fields/TextAreaField'
 import TextField from '../components/fields/TextField'
+import { navigate } from '../navigation'
 import WorkItemValidator from '../validators/WorkItemValidator'
 import './WorkItemEditPage.css'
 
-type SaveMessage = {
-  isError: boolean
-  text: string
+type WorkItemEditPageProps = {
+  workItemId?: number
 }
 
-function WorkItemEditPage() {
-  const [workItem, setWorkItem] = useState<WorkItemModel>({
-    title: '',
-    description: null,
-    statusId: WorkItemStatusId.New,
-    address: '',
-    gardenerId: null,
-    scheduledDate: null,
-    completionDate: null,
-    cancellationDate: null,
-    isDeleted: false,
-  })
-  const [persistedWorkItem, setPersistedWorkItem] = useState<WorkItemModel>()
-  const [isSaving, setIsSaving] = useState(false)
-  const [saveMessage, setSaveMessage] = useState<SaveMessage>()
+type ProcessingAction = 'save' | 'complete' | 'cancel'
+
+function WorkItemEditPage({ workItemId }: WorkItemEditPageProps) {
+  const [workItem, setWorkItem] = useState<WorkItemModel | undefined>(() =>
+    workItemId === undefined ? newWorkItem() : undefined,
+  )
+  const [persistedWorkItem, setPersistedWorkItem] = useState<WorkItemModel | undefined>(
+    () => (workItemId === undefined ? workItem : undefined),
+  )
+  const [loadError, setLoadError] = useState<string>()
+  const [processingAction, setProcessingAction] = useState<ProcessingAction>()
+  const [saveError, setSaveError] = useState<string>()
+
+  useEffect(() => {
+    if (workItemId === undefined) return
+
+    let ignore = false
+
+    Api.getWorkItem(workItemId)
+      .then((loadedWorkItem) => {
+        if (ignore) return
+
+        setWorkItem(loadedWorkItem)
+        setPersistedWorkItem(loadedWorkItem)
+      })
+      .catch((reason: unknown) => {
+        if (!ignore) {
+          setLoadError(reason instanceof Error ? reason.message : 'Unable to load work item')
+        }
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [workItemId])
+
+  if (workItem === undefined) {
+    return (
+      <PageFrame actions={<LinkButton href="/">Back</LinkButton>} title="Edit Work Item">
+        <p
+          className={
+            loadError
+              ? 'work-item-edit-page__message work-item-edit-page__message--error'
+              : 'work-item-edit-page__message'
+          }
+          role={loadError ? 'alert' : 'status'}
+        >
+          {loadError ?? 'Loading work item…'}
+        </p>
+      </PageFrame>
+    )
+  }
+
   const validator = new WorkItemValidator(workItem)
   const validation = validator.validate()
   const isDirty = workItem !== persistedWorkItem
+  const isProcessing = processingAction !== undefined
 
   function updateWorkItem(update: (current: WorkItemModel) => WorkItemModel) {
-    setSaveMessage(undefined)
-    setWorkItem(update)
+    setSaveError(undefined)
+    setWorkItem((current) => (current === undefined ? current : update(current)))
   }
 
-  async function handleSave() {
-    if (validation || isSaving || !isDirty) return
+  async function persist(updatedWorkItem: WorkItemModel, action: ProcessingAction) {
+    if (validation || isProcessing) return
 
-    setIsSaving(true)
-    setSaveMessage(undefined)
+    setProcessingAction(action)
+    setSaveError(undefined)
 
     try {
-      const savedWorkItem = await Api.saveWorkItem(workItem)
-      setWorkItem(savedWorkItem)
-      setPersistedWorkItem(savedWorkItem)
-      setSaveMessage({ isError: false, text: 'Work item saved.' })
+      await Api.saveWorkItem(updatedWorkItem)
+      navigate('/')
     } catch (reason: unknown) {
-      setSaveMessage({
-        isError: true,
-        text: reason instanceof Error ? reason.message : 'Unable to save work item',
-      })
+      setSaveError(reason instanceof Error ? reason.message : 'Unable to save work item')
     } finally {
-      setIsSaving(false)
+      setProcessingAction(undefined)
     }
   }
 
+  function handleProcessAction(action: Exclude<ProcessingAction, 'save'>) {
+    if (workItem === undefined) return
+
+    const businessDate = getToday()
+    const updatedWorkItem = action === 'complete'
+      ? {
+          ...workItem,
+          statusId: WorkItemStatusId.Done,
+          completionDate: businessDate,
+          cancellationDate: null,
+        }
+      : {
+          ...workItem,
+          statusId: WorkItemStatusId.Cancelled,
+          completionDate: null,
+          cancellationDate: businessDate,
+        }
+
+    void persist(updatedWorkItem, action)
+  }
+
   return (
-    <PageFrame title={workItem.workItemId === undefined ? 'Add Work Item' : 'Edit Work Item'}>
+    <PageFrame
+      actions={
+        <LinkButton href="/" warning={isDirty}>
+          Back
+        </LinkButton>
+      }
+      title={workItem.workItemId === undefined ? 'Add Work Item' : 'Edit Work Item'}
+    >
       <form
         className="work-item-edit-page__form"
         onSubmit={(event) => {
           event.preventDefault()
-          void handleSave()
+          if (isDirty) void persist(workItem, 'save')
         }}
       >
-        {saveMessage && (
-          <p
-            className={
-              saveMessage.isError
-                ? 'work-item-edit-page__message work-item-edit-page__message--error'
-                : 'work-item-edit-page__message'
-            }
-            role={saveMessage.isError ? 'alert' : 'status'}
-          >
-            {saveMessage.text}
+        {saveError && (
+          <p className="work-item-edit-page__message work-item-edit-page__message--error" role="alert">
+            {saveError}
           </p>
         )}
 
         <Panel
           actions={
             <Button
-              disabled={Boolean(validation) || !isDirty}
-              isProcessing={isSaving}
+              disabled={Boolean(validation) || !isDirty || isProcessing}
+              isProcessing={processingAction === 'save'}
               primary={!validation && isDirty}
               title={validation ?? (!isDirty ? 'No changes to save.' : undefined)}
               tooltipError={Boolean(validation)}
@@ -147,9 +203,59 @@ function WorkItemEditPage() {
             validator={validator.description}
           />
         </Panel>
+
+        {workItem.workItemId !== undefined &&
+          !workItem.completionDate &&
+          !workItem.cancellationDate && (
+            <div className="work-item-edit-page__actions">
+              <Button
+                disabled={Boolean(validation) || isProcessing}
+                isProcessing={processingAction === 'complete'}
+                onClick={() => handleProcessAction('complete')}
+                title={validation}
+                tooltipError={Boolean(validation)}
+              >
+                Completed
+              </Button>
+
+              <Button
+                disabled={Boolean(validation) || isProcessing}
+                isProcessing={processingAction === 'cancel'}
+                onClick={() => handleProcessAction('cancel')}
+                title={validation}
+                tooltipError={Boolean(validation)}
+                warning
+              >
+                Cancel Job
+              </Button>
+            </div>
+          )}
       </form>
     </PageFrame>
   )
+}
+
+function newWorkItem(): WorkItemModel {
+  return {
+    title: '',
+    description: null,
+    statusId: WorkItemStatusId.New,
+    address: '',
+    gardenerId: null,
+    scheduledDate: null,
+    completionDate: null,
+    cancellationDate: null,
+    isDeleted: false,
+  }
+}
+
+function getToday(): string {
+  // TODO: Get the current business date from an API controller backed by IDateTimeService.
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 export default WorkItemEditPage

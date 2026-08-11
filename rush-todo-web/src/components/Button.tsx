@@ -7,6 +7,7 @@ type ButtonProps = {
   isProcessing?: boolean
   primary?: boolean
   tooltipError?: boolean
+  warning?: boolean
 } & Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'onClick' | 'title' | 'type'>
 
 function Button({
@@ -18,8 +19,15 @@ function Button({
   title,
   tooltipError,
   type = 'button',
+  warning,
 }: ButtonProps) {
-  const cssClass = primary ? 'button button--primary' : 'button'
+  const cssClass = [
+    'button',
+    primary ? 'button--primary' : '',
+    warning ? 'button--warning' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
   const isDisabled = Boolean(disabled || isProcessing)
 
   return (

@@ -134,33 +134,32 @@ Use singular controller/resource names:
 GET    /work-item/{id}
 POST   /work-item
 PUT    /work-item/{id}
-POST   /work-item/{id}/cancel
-POST   /work-item/search
+GET    /work-item
 GET    /gardener
 GET    /health
 ```
 
-Use `WorkItemController` and `GardenerController`. Search is POST deliberately because the contract contains arrays and may evolve. Controllers remain thin. Enable Swagger/OpenAPI.
+Use `WorkItemController` and `GardenerController`. Search is GET with repeated query parameters for arrays. Controllers remain thin. Enable Swagger/OpenAPI.
 
 ### Optimistic Concurrency
 
 Use `UpdateDateTime` as the concurrency token. The client returns the version it received. On stale update/state change, reject it using the VegiCoop concurrency-exception pattern and return an appropriate HTTP conflict. Never silently overwrite newer data. Keep concurrency centralised below controllers.
 
-### Cancellation
+### Completion and Cancellation
 
-Cancellation is a business operation, not deletion. Set `StatusId = WorkItemStatusId.Cancelled` and `CancellationDate` through the service layer. Gardeners retain `IsDeleted`, although gardener CRUD/delete endpoints are not required.
+Completion and cancellation are business operations, not deletion. Their UI actions populate `CompletionDate` or `CancellationDate` and persist through the normal WorkItem update; the service derives the denormalized status from process dates. Gardeners retain `IsDeleted`, although gardener CRUD/delete endpoints are not required.
 
 ## Validation
 
-Create WorkItem write validation only; no Gardener validator. Title and Address are required with sensible maximum lengths; GardenerId is optional; Description optional; Scheduled requires `ScheduledDate`; Done requires `CompletionDate`; Cancelled requires `CancellationDate`. Keep validators simple and dependency-free where practical. Backend validation is authoritative. React may duplicate simple UX validation, but do not build validation code generation now.
+Create WorkItem write validation only; no Gardener validator. Title and Address are required with sensible maximum lengths; GardenerId and Description are optional. Status is derived from process dates before validation; Done requires `CompletionDate` and Cancelled requires `CancellationDate`. Keep validators simple and dependency-free where practical. Backend validation is authoritative. React may duplicate simple UX validation, but do not build validation code generation now.
 
 ## React UI
 
-Use React + TypeScript + Vite + Bootstrap. Inspect VegiCoop's UI and reproduce its general feel/interaction patterns where natural. Infer my style and apply idiomatic React equivalents. Keep it straightforward and easy to modify live. Do not introduce Redux/global state management; use ordinary React state and explicit data flow.
+Use React + TypeScript + Vite with app-owned CSS, not Bootstrap. Inspect VegiCoop's UI and reproduce its general feel/interaction patterns where natural. Infer my style and apply idiomatic React equivalents. Keep it straightforward and easy to modify live. Do not introduce Redux/global state management; use ordinary React state and explicit data flow.
 
-Home page: table of incomplete WorkItems, suggested columns Title, Gardener, Address, Scheduled Date, Status, Actions. Sort sensibly by scheduling. Filtering by Gardener/Status and simple sorting are optional later additions, not blockers.
+Home page: mobile-first clickable tiles of incomplete WorkItems. Show a bold title followed by Address, Gardener, Scheduled Date and Description without repeated field labels or a Status field. The entire tile opens the WorkItem. Sort sensibly by scheduling. Filtering and simple sorting are optional later additions, not blockers.
 
-Provide Add and row Edit using the same dialog/modal. Fields: Title, Description, Gardener, Address, Status, Scheduled Date, Completion Date, Cancellation Date where appropriate. Populate Gardeners from the API. Provide row Cancel with confirmation where appropriate.
+Provide Add and Edit as pages rather than dialogs. Editable fields are Title, Address, Gardener, Scheduled Date and Description. Status and terminal dates are action-owned rather than directly editable. Back is visually red when the model is dirty; successful saves, completion and cancellation return home.
 
 ## React API Facade
 
@@ -171,12 +170,11 @@ Api.getGardeners()
 Api.searchWorkItems(search)
 Api.getWorkItem(id)
 Api.saveWorkItem(workItem)
-Api.cancelWorkItem(id, ...)
 ```
 
 Keep verbs, URLs, JSON serialization/deserialization and common errors inside this layer rather than scattering `fetch`. Prefer generated TypeScript API models/client from Swagger if simple/reliable, but hide generated details behind the facade. If generation becomes a time sink, use a small explicit API layer instead.
 
-Use strict TypeScript, ESLint/consistent formatting, small readable components, Bootstrap, minimal dependencies, no `any` unless unavoidable, and no unnecessary advanced React abstractions. Add brief comments for unfamiliar React-specific constructs where useful.
+Use strict TypeScript, consistent linting/formatting, small readable components, app-owned CSS, minimal dependencies, no `any` unless unavoidable, and no unnecessary advanced React abstractions. Add brief comments for unfamiliar React-specific constructs where useful.
 
 ## Integration Tests
 
@@ -273,6 +271,7 @@ Treat this as a backlog, **not permission to implement everything immediately**:
 16. Add cancellation behaviour.
 17. Add filtering/sorting if useful and time permits.
 18. Add README/interview notes.
+19. Expose the current business date through an API controller backed by `IDateTimeService`, then replace the React client-clock fallback used by the Completed and Cancel Job actions.
 
 Do not begin the next backlog item until I explicitly ask you to continue.
 

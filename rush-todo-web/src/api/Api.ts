@@ -1,4 +1,4 @@
-import type { LookupItem, WorkItemModel } from './models'
+import type { LookupItem, WorkItemModel, WorkItemSearchParameters } from './models'
 
 type RequestOptions = {
   body?: unknown
@@ -29,8 +29,26 @@ async function getErrorMessage(response: Response): Promise<string> {
   return fallback
 }
 
+function getWorkItemSearchUrl(parameters: WorkItemSearchParameters): string {
+  const query = new URLSearchParams()
+
+  parameters.gardenerIds?.forEach((gardenerId) =>
+    query.append('gardenerIds', String(gardenerId)),
+  )
+  parameters.statusIds?.forEach((statusId) => query.append('statusIds', String(statusId)))
+  if (parameters.scheduledFrom) query.set('scheduledFrom', parameters.scheduledFrom)
+  if (parameters.scheduledTo) query.set('scheduledTo', parameters.scheduledTo)
+  if (parameters.includeDeleted) query.set('includeDeleted', 'true')
+
+  const queryString = query.toString()
+  return queryString ? `/work-item?${queryString}` : '/work-item'
+}
+
 const Api = {
   getGardeners: () => request<LookupItem[]>('/gardener'),
+  getWorkItem: (workItemId: number) => request<WorkItemModel>(`/work-item/${workItemId}`),
+  searchWorkItems: (parameters: WorkItemSearchParameters) =>
+    request<WorkItemModel[]>(getWorkItemSearchUrl(parameters)),
   saveWorkItem: (workItem: WorkItemModel) =>
     workItem.workItemId === undefined
       ? request<WorkItemModel>('/work-item', { body: workItem, method: 'POST' })

@@ -25,3 +25,11 @@ export type WorkItemModel = {
   cancellationDate: string | null
   isDeleted: boolean
 }
+
+export type WorkItemSearchParameters = {
+  gardenerIds?: readonly number[]
+  includeDeleted?: boolean
+  scheduledFrom?: string
+  scheduledTo?: string
+  statusIds?: readonly WorkItemStatusId[]
+}
