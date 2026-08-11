@@ -44,4 +44,17 @@ Files ending in `.tsx` are TypeScript files that may contain JSX markup. A React
 
 `StrictMode` in `main.tsx` enables additional development checks. Some component lifecycle work may intentionally run twice during development; this does not happen in a production build.
 
-For now, change the text in `src/App.tsx`, save it, and watch the browser update. The next useful increment is the API facade; components should call that rather than scattering `fetch` requests.
+The current component hierarchy is:
+
+```text
+App
+└── WorkItemEditPage
+    └── PageFrame
+        └── Panel
+            ├── TextField (Title)
+            └── TextField (Address)
+```
+
+`WorkItemEditPage` owns the draft WorkItem in `useState`. Each `TextField` is controlled: it receives its current value and reports changes through `onChange`. The page creates a new state object for each change rather than mutating the existing object; React then renders the updated values.
+
+Shared field presentation belongs in `FieldWrapper`; input-specific behaviour belongs in controls such as `TextField`. Base styling is mobile-first: fields use one column and expand to two columns only when enough width is available.

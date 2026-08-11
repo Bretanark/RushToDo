@@ -27,6 +27,7 @@ Install:
 - Visual Studio with the **ASP.NET and web development** workload;
 - Visual Studio's **Data storage and processing** workload, or SQL Server Data Tools, for `RushTodo.Database.sqlproj` and DACPAC deployment;
 - Visual Studio Code for focused React/TypeScript development;
+- the [React Developer Tools](https://react.dev/learn/react-developer-tools) browser extension for inspecting component props, state and rendering in Chrome DevTools;
 - Git for Windows so Visual Studio Code and other development tools can access the repository;
 - the .NET SDK selected when the API projects are created;
 - SQL Server/LocalDB available for local development and integration tests;

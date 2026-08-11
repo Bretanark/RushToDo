@@ -1,11 +1,7 @@
-import './App.css'
+import WorkItemEditPage from './pages/WorkItemEditPage'
 
 function App() {
-  return (
-    <main className="placeholder">
-      <h1>To be implemented!</h1>
-    </main>
-  )
+  return <WorkItemEditPage />
 }
 
 export default App

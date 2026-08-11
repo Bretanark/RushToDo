@@ -1,0 +1,27 @@
+.page-frame {
+  width: 100%;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.page-frame__header {
+  margin-bottom: var(--space-4);
+}
+
+.page-frame__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.page-frame__body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 48rem) {
+  .page-frame {
+    padding: var(--space-6);
+  }
+}
