@@ -12,7 +12,7 @@ RushTodo.UnitTests
 RushTodo.IntegrationTests
 ```
 
-The solution currently contains documentation only. Projects will be added one focused increment at a time.
+The solution currently contains the SQL Server database project and documentation. Remaining projects will be added one focused increment at a time.
 
 ## Start Here
 
@@ -37,12 +37,14 @@ The future SQL Project may not build with the plain .NET CLI because it uses SSD
 ## Architecture Principles
 
 - SQL Server schema lives in the SQL Project and deploys through a DACPAC; EF migrations are not the authority.
+- Post-deploy seed scripts contain required reference data only. Optional/bootstrap business data belongs in explicitly run scripts under `RushTodo.Database/Scripts/Upgrade`.
 - The API is a conventional C#/.NET HTTP boundary. Controllers are thin; services own business operations; repositories own EF persistence and caching.
 - Reuse the proven VeggieCoOp foundations: entity/model mapping, `ServiceBase`, `BaseRepository`/`StaticRepository`, transaction orchestration, auditing, validation, and optimistic concurrency.
 - Concrete keys are `TodoId` and `GardenerId`; shared entity/model abstractions expose `Id` and `UpdateDateTime` for generic infrastructure.
 - `UpdateDateTime` is a UTC `DATETIME2` optimistic-concurrency token. Reject stale writes centrally and translate them in API exception middleware to `409 Conflict`.
 - `DateOnly` is for business dates and maps to SQL `DATE`; genuine instants are UTC `DateTime` values from `IDateTimeService.UtcNow`.
 - Cancellation is a Todo business operation. It is distinct from soft deletion.
+- Until authentication and authorization are implemented, auditing uses one seeded development `AppUser` with the stable ID `1`. Replace this with authenticated user provisioning when that work begins.
 - React is TypeScript/Vite with app-owned CSS and shared controls—not Bootstrap. UI code calls one API facade rather than scattering `fetch`.
 
 ## Coding Standards
