@@ -4,14 +4,13 @@ USING
     VALUES
         (1, N'AppUser'),
         (2, N'Gardener'),
-        (3, N'Todo')
-) AS source (EntityTypeId, Name)
+        (3, N'WorkItem')
+) AS source (EntityTypeId, EntityTypeName)
     ON target.EntityTypeId = source.EntityTypeId
-WHEN MATCHED AND target.Name <> source.Name THEN
+WHEN MATCHED AND target.EntityTypeName <> source.EntityTypeName THEN
     UPDATE SET
-        Name = source.Name,
-        UpdateDateTime = SYSUTCDATETIME()
+        EntityTypeName = source.EntityTypeName
 WHEN NOT MATCHED BY TARGET THEN
-    INSERT (EntityTypeId, Name, UpdateDateTime)
-    VALUES (source.EntityTypeId, source.Name, SYSUTCDATETIME());
+    INSERT (EntityTypeId, EntityTypeName)
+    VALUES (source.EntityTypeId, source.EntityTypeName);
 GO

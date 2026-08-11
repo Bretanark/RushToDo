@@ -1,6 +1,6 @@
 # RushTodo
 
-Small, polished technical-interview vertical slice for managing gardeners' todos.
+Small, polished technical-interview vertical slice for managing gardeners' work items.
 
 The intended solution shape is:
 
@@ -12,7 +12,7 @@ RushTodo.UnitTests
 RushTodo.IntegrationTests
 ```
 
-The solution currently contains the SQL Server database project and documentation. Remaining projects will be added one focused increment at a time.
+The solution currently contains the Web API shell, persisted entities, SQL Server database project, and documentation. Remaining projects will be added one focused increment at a time.
 
 ## Start Here
 
@@ -40,10 +40,11 @@ The future SQL Project may not build with the plain .NET CLI because it uses SSD
 - Post-deploy seed scripts contain required reference data only. Optional/bootstrap business data belongs in explicitly run scripts under `RushTodo.Database/Scripts/Upgrade`.
 - The API is a conventional C#/.NET HTTP boundary. Controllers are thin; services own business operations; repositories own EF persistence and caching.
 - Reuse the proven VeggieCoOp foundations: entity/model mapping, `ServiceBase`, `BaseRepository`/`StaticRepository`, transaction orchestration, auditing, validation, and optimistic concurrency.
-- Concrete keys are `TodoId` and `GardenerId`; shared entity/model abstractions expose `Id` and `UpdateDateTime` for generic infrastructure.
+- Concrete keys are `WorkItemId` and `GardenerId`; shared entity/model abstractions expose `Id` and `UpdateDateTime` for generic infrastructure.
+- Small reference entities such as `EntityType` and `WorkItemStatus` inherit from `Enummy`. Like `Entity.Id`, their `int Id` is an unmapped alias over an explicit enum-typed mapped key such as `WorkItemStatusId`; this keeps generic lookup dictionaries simple without discarding domain typing. Enummy properties are read-only to application code, expose an explicitly named display property for queries/selectors, and do not carry irrelevant entity timestamps.
 - `UpdateDateTime` is a UTC `DATETIME2` optimistic-concurrency token. Reject stale writes centrally and translate them in API exception middleware to `409 Conflict`.
 - `DateOnly` is for business dates and maps to SQL `DATE`; genuine instants are UTC `DateTime` values from `IDateTimeService.UtcNow`.
-- Cancellation is a Todo business operation. It is distinct from soft deletion.
+- A work item may be unassigned, so `GardenerId` is nullable. Cancellation is a WorkItem business operation and remains distinct from soft deletion.
 - Until authentication and authorization are implemented, auditing uses one seeded development `AppUser` with the stable ID `1`. Replace this with authenticated user provisioning when that work begins.
 - React is TypeScript/Vite with app-owned CSS and shared controls—not Bootstrap. UI code calls one API facade rather than scattering `fetch`.
 

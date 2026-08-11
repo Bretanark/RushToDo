@@ -8,6 +8,7 @@ This is working memory for future agents. Keep engineering standards and durable
 - Do not implement a later backlog item until Brent explicitly asks.
 - Be proactive within the requested increment, but do not create speculative code.
 - If a decision, assumption, trade-off, or disagreement might be worth discussing, raise it with Brent before implementing it. A brief friendly argument is preferable to avoidable rework.
+- When time is explicitly constrained, call out diminishing returns and scope creep. Once the foundations are coherent, steer the next increment toward the smallest working end-to-end slice.
 - Do not stage changes automatically; Brent stages reviewed files manually.
 - Do not stop, restart, or otherwise disturb a running development process unless Brent explicitly asks.
 

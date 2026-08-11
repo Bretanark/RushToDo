@@ -44,17 +44,17 @@ Controllers are thin HTTP adapters. Real work belongs in services. Persistence/c
 
 ## Domain Model
 
-### Todo
+### WorkItem
 
 ```csharp
-Todo
+WorkItem
 {
     int Id
     string Title
     string Description
-    TodoStatus Status
+    WorkItemStatusId StatusId
     string Address
-    int GardenerId
+    int? GardenerId
     DateOnly? ScheduledDate
     DateOnly? CompletionDate
     DateOnly? CancellationDate
@@ -66,12 +66,12 @@ Todo
 `Id` is an integer identity. `Description` maps to `varchar(max)`. Scheduled/completion/cancellation values are nullable business dates. `UpdateDateTime` is optimistic concurrency. `DateTime` represents an actual instant and is UTC by convention—do not suffix `Utc`. `DateOnly` represents a calendar/business date and must not be converted to UTC or arbitrary midnight DateTimes. Creation/history auditing comes from the VegiCoop auditing pattern; do not add `CreateDateTime`. `IsDeleted` is for administrative/data-retention concerns; cancellation is a business operation.
 
 ```csharp
-enum TodoStatus
+enum WorkItemStatusId
 {
-    Todo,
-    Scheduled,
-    Done,
-    Cancelled
+    New = 1,
+    Scheduled = 2,
+    Done = 3,
+    Cancelled = 4
 }
 ```
 
@@ -89,34 +89,34 @@ Gardener
 }
 ```
 
-Phone is required; email optional. A Todo has a required Gardener. Gardener is a domain entity, not an authentication identity. No gardener-management UI is required.
+Phone is required; email optional. A WorkItem may be unassigned or have one Gardener. Gardener is a domain entity, not an authentication identity. No gardener-management UI is required.
 
 ## Database
 
-Use SQL Server. `RushTodo.Database` is a SQL Project and the authoritative schema definition. Follow VegiCoop's SQL Project/DACPAC approach. Create `Gardeners`, `Todos`, relevant auditing support, and appropriate FKs/indexes/constraints/lengths. Do not use EF migrations as the authoritative deployment mechanism.
+Use SQL Server. `RushTodo.Database` is a SQL Project and the authoritative schema definition. Follow VegiCoop's SQL Project/DACPAC approach. Create singular `Gardener` and `WorkItem` tables, enummy `EntityType` and `WorkItemStatus` reference tables, relevant auditing support, and appropriate FKs/constraints/lengths. Do not use EF migrations as the authoritative deployment mechanism.
 
-Provide a local development deployment profile following VegiCoop and a separate integration-test profile that recreates the integration-test database. Database deployment creates schema only; do not couple seed data into DACPAC deployment. Integration-test infrastructure owns all deterministic test data.
+Provide a local development deployment profile following VegiCoop and a separate integration-test profile that recreates the integration-test database. Post-deploy scripts seed only required reference data; manually run upgrade scripts may initialise local business data. Integration-test infrastructure owns all deterministic test business data.
 
 ## Repositories and Services
 
-Follow VegiCoop patterns. Create `TodoRepository` and `GardenerRepository`; Gardener data may be cached as relatively static reference data, while Todos are transactional and query SQL Server directly. Create `ITodoService`/`TodoService` and `IGardenerService`/`GardenerService`, with each interface in the same file as its implementation. Controllers call services only.
+Follow VegiCoop patterns. Create `WorkItemRepository` and `GardenerRepository`; Gardener data may be cached as relatively static reference data, while WorkItems are transactional and query SQL Server directly. Create `IWorkItemService`/`WorkItemService` and `IGardenerService`/`GardenerService`, with each interface in the same file as its implementation. Controllers call services only.
 
-## Todo Search
+## WorkItem Search
 
 ```csharp
-public class TodoSearch
+public class WorkItemSearch
 {
     public int[]? GardenerIds { get; set; }
     public DateOnly? ScheduledFrom { get; set; }
     public DateOnly? ScheduledTo { get; set; }
-    public TodoStatus[]? Statuses { get; set; }
+    public WorkItemStatusId[]? StatusIds { get; set; }
     public bool IncludeDeleted { get; set; }
 }
 ```
 
 ```csharp
-Task<IReadOnlyList<TodoModel>> SearchAsync(
-    TodoSearch search,
+Task<IReadOnlyList<WorkItemModel>> SearchAsync(
+    WorkItemSearch search,
     CancellationToken cancellationToken = default);
 ```
 
@@ -131,15 +131,15 @@ Reuse VegiCoop's user-context and date/time-service patterns. User context inclu
 Use singular controller/resource names:
 
 ```text
-GET    /api/todo/{id}
-POST   /api/todo
-PUT    /api/todo/{id}
-POST   /api/todo/{id}/cancel
-POST   /api/todo/search
+GET    /api/work-item/{id}
+POST   /api/work-item
+PUT    /api/work-item/{id}
+POST   /api/work-item/{id}/cancel
+POST   /api/work-item/search
 GET    /api/gardener
 ```
 
-Use `TodoController` and `GardenerController`. Search is POST deliberately because the contract contains arrays and may evolve. Controllers remain thin. Enable Swagger/OpenAPI.
+Use `WorkItemController` and `GardenerController`. Search is POST deliberately because the contract contains arrays and may evolve. Controllers remain thin. Enable Swagger/OpenAPI.
 
 ### Optimistic Concurrency
 
@@ -147,17 +147,17 @@ Use `UpdateDateTime` as the concurrency token. The client returns the version it
 
 ### Cancellation
 
-Cancellation is a business operation, not deletion. Set `Status = Cancelled` and `CancellationDate` through the service layer. Gardeners retain `IsDeleted`, although gardener CRUD/delete endpoints are not required.
+Cancellation is a business operation, not deletion. Set `StatusId = WorkItemStatusId.Cancelled` and `CancellationDate` through the service layer. Gardeners retain `IsDeleted`, although gardener CRUD/delete endpoints are not required.
 
 ## Validation
 
-Create Todo write validation only; no Gardener validator. Title and Address are required with sensible maximum lengths; GardenerId required; Description optional; Scheduled requires `ScheduledDate`; Done requires `CompletionDate`; Cancelled requires `CancellationDate`. Keep validators simple and dependency-free where practical. Backend validation is authoritative. React may duplicate simple UX validation, but do not build validation code generation now.
+Create WorkItem write validation only; no Gardener validator. Title and Address are required with sensible maximum lengths; GardenerId is optional; Description optional; Scheduled requires `ScheduledDate`; Done requires `CompletionDate`; Cancelled requires `CancellationDate`. Keep validators simple and dependency-free where practical. Backend validation is authoritative. React may duplicate simple UX validation, but do not build validation code generation now.
 
 ## React UI
 
 Use React + TypeScript + Vite + Bootstrap. Inspect VegiCoop's UI and reproduce its general feel/interaction patterns where natural. Infer my style and apply idiomatic React equivalents. Keep it straightforward and easy to modify live. Do not introduce Redux/global state management; use ordinary React state and explicit data flow.
 
-Home page: table of incomplete Todos, suggested columns Title, Gardener, Address, Scheduled Date, Status, Actions. Sort sensibly by scheduling. Filtering by Gardener/Status and simple sorting are optional later additions, not blockers.
+Home page: table of incomplete WorkItems, suggested columns Title, Gardener, Address, Scheduled Date, Status, Actions. Sort sensibly by scheduling. Filtering by Gardener/Status and simple sorting are optional later additions, not blockers.
 
 Provide Add and row Edit using the same dialog/modal. Fields: Title, Description, Gardener, Address, Status, Scheduled Date, Completion Date, Cancellation Date where appropriate. Populate Gardeners from the API. Provide row Cancel with confirmation where appropriate.
 
@@ -167,10 +167,10 @@ Create one simple TypeScript API facade so UI code uses operations conceptually 
 
 ```typescript
 Api.getGardeners()
-Api.searchTodos(search)
-Api.getTodo(id)
-Api.saveTodo(todo)
-Api.cancelTodo(id, ...)
+Api.searchWorkItems(search)
+Api.getWorkItem(id)
+Api.saveWorkItem(workItem)
+Api.cancelWorkItem(id, ...)
 ```
 
 Keep verbs, URLs, JSON serialization/deserialization and common errors inside this layer rather than scattering `fetch`. Prefer generated TypeScript API models/client from Swagger if simple/reliable, but hide generated details behind the facade. If generation becomes a time sink, use a small explicit API layer instead.
@@ -186,7 +186,7 @@ RushTodo.IntegrationTests/
     TestData/
         TestData.cs
         GardenerTestData.cs
-        TodoTestData.cs
+        WorkItemTestData.cs
     Helpers/
     Tests/
     GlobalSetup.cs
@@ -200,23 +200,23 @@ The API should read naturally:
 TestData.Gardener.Bob
 TestData.Gardener.Mary
 TestData.Gardener.DeletedDave
-TestData.Todo.BobMowSmithStreet
-TestData.Todo.MaryTrimJonesHedge
+TestData.WorkItem.BobMowSmithStreet
+TestData.WorkItem.MaryTrimJonesHedge
 ```
 
-Each Todo explicitly references its Gardener, e.g. `Gardener = TestData.Gardener.Bob`. Definitions describe logical records, not manual IDs. Seeding assigns deterministic integer IDs and explicitly inserts identities where necessary, so `TestData.Gardener.Bob.Id` is stable without magic IDs scattered through tests.
+Each assigned WorkItem explicitly references its Gardener, e.g. `Gardener = TestData.Gardener.Bob`; include at least one unassigned WorkItem. Definitions describe logical records, not manual IDs. Seeding assigns deterministic integer IDs and explicitly inserts identities where necessary, so `TestData.Gardener.Bob.Id` is stable without magic IDs scattered through tests.
 
-Include active gardeners, a soft-deleted gardener, Todos across gardeners/statuses, scheduled/unscheduled, completed/cancelled, and useful date ranges. Normal Gardener retrieval should exclude the deleted gardener.
+Include active gardeners, a soft-deleted gardener, WorkItems across gardeners/statuses, assigned/unassigned, scheduled/unscheduled, completed/cancelled, and useful date ranges. Normal Gardener retrieval should exclude the deleted gardener.
 
 After initial setup, deterministic data need not be recreated every run if already present. Tests must tolerate unrelated records from previous runs and avoid mutating shared baseline records unless isolated/restored.
 
 ### Search Integration Tests
 
-Focus on `TodoService.SearchAsync`: baseline expected Todos, one/multiple Gardeners, statuses, scheduled-date ranges, completed/cancelled as appropriate. Exercise the real service/repository/EF/SQL stack.
+Focus on `WorkItemService.SearchAsync`: baseline expected WorkItems, one/multiple Gardeners, statuses, scheduled-date ranges, completed/cancelled as appropriate. Exercise the real service/repository/EF/SQL stack.
 
 ### Create-and-Search Test
 
-Create a Todo with a GUID-derived title, e.g. `Integration Test {Guid.NewGuid()}`. Use shared date/time infrastructure to obtain today's New Zealand business date as `ScheduledDate`. Create through the real stack, search using today's date plus its unique title/appropriate criteria, and assert it returns correctly. Do not reset the database afterwards; reruns must tolerate accumulated rows.
+Create a WorkItem with a GUID-derived title, e.g. `Integration Test {Guid.NewGuid()}`. Use shared date/time infrastructure to obtain today's New Zealand business date as `ScheduledDate`. Create through the real stack, search using today's date plus its unique title/appropriate criteria, and assert it returns correctly. Do not reset the database afterwards; reruns must tolerate accumulated rows.
 
 ## CSV-Style Expected Result Assertions
 
@@ -226,7 +226,7 @@ For tabular/list integration results, use inline CSV as C# raw strings:
 const string Expected = """
     Id,Title,Status,Gardener
     1,Mow Smith Street,Scheduled,Bob
-    3,Trim Hedge,Todo,Mary
+    3,Trim Hedge,New,Mary
     """;
 ```
 
@@ -236,7 +236,7 @@ For intentional changes: run test, copy actual CSV over expected, review in Beyo
 
 ## Unit Tests
 
-Use NUnit and keep this project deliberately small. Add focused `TodoValidator` tests: missing Title; missing Address; Scheduled without date; Done without completion date; Cancelled without cancellation date; valid Todo.
+Use NUnit and keep this project deliberately small. Add focused `WorkItemValidator` tests: missing Title; missing Address; Scheduled without date; Done without completion date; Cancelled without cancellation date; valid WorkItem.
 
 Validators remain dependency-free where practical. Also include one small Moq test demonstrating genuine dependency mocking. A likely candidate is a service using the shared date/time service so current date/time can be mocked deterministically. If no natural candidate emerges, leave a TODO rather than distort the design.
 
@@ -267,8 +267,8 @@ Treat this as a backlog, **not permission to implement everything immediately**:
 11. Add unit tests.
 12. Create React/TypeScript/Bootstrap application.
 13. Add React API facade.
-14. Add Todo list UI.
-15. Add Todo add/edit UI.
+14. Add WorkItem list UI.
+15. Add WorkItem add/edit UI.
 16. Add cancellation behaviour.
 17. Add filtering/sorting if useful and time permits.
 18. Add README/interview notes.
@@ -277,6 +277,6 @@ Do not begin the next backlog item until I explicitly ask you to continue.
 
 ## React Learning Notes
 
-Create a short `REACT-NOTES.md` alongside the frontend, practical and specific to this solution. Explain where the app starts; component hierarchy; page state and `useState`; API calls/facade; Todo rendering; add/edit dialog; forms/validation; Bootstrap; and where to make common interview changes such as adding a field/filter/column, calling a new API method or changing dialog behaviour.
+Create a short `REACT-NOTES.md` alongside the frontend, practical and specific to this solution. Explain where the app starts; component hierarchy; page state and `useState`; API calls/facade; WorkItem rendering; add/edit dialog; forms/validation; app-owned CSS; and where to make common interview changes such as adding a field/filter/column, calling a new API method or changing dialog behaviour.
 
 Where useful, relate React concepts to Blazor/C# without forcing bad analogies. Keep it concise enough for a quick pre-interview refresher.

@@ -57,6 +57,7 @@
     <Folder Include="Properties" />
     <Folder Include="Tables" />
     <Folder Include="Scripts" />
+    <Folder Include="Scripts\Miscellaneous" />
     <Folder Include="Scripts\Seed" />
     <Folder Include="Scripts\Upgrade" />
   </ItemGroup>
@@ -66,10 +67,12 @@
     <Build Include="Tables\AuditEvent.sql" />
     <Build Include="Tables\AuditItem.sql" />
     <Build Include="Tables\Gardener.sql" />
-    <Build Include="Tables\Todo.sql" />
+    <Build Include="Tables\WorkItemStatus.sql" />
+    <Build Include="Tables\WorkItem.sql" />
     <None Include="Scripts\Seed.sql" />
     <None Include="Scripts\Seed\AppUser.sql" />
     <None Include="Scripts\Seed\EntityType.sql" />
+    <None Include="Scripts\Seed\WorkItemStatus.sql" />
     <None Include="Scripts\Upgrade\2026-08-11 Initialize Gardeners.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
+    <None Include="Scripts\Miscellaneous\Useful SQL.sql" />
     <None Include="Test.publish.xml" />
   </ItemGroup>
   <ItemGroup>
