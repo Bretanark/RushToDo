@@ -4,6 +4,10 @@
   grid-template-columns: minmax(0, 1fr) 3rem;
 }
 
+.autocomplete--clearable {
+  grid-template-columns: minmax(0, 1fr) 3rem 3rem;
+}
+
 .autocomplete__input {
   border-radius: calc(var(--radius) / 2) 0 0 calc(var(--radius) / 2);
 }
@@ -25,6 +29,10 @@
   border-color: var(--color-focus);
   outline: 3px solid color-mix(in srgb, var(--color-focus) 22%, transparent);
   outline-offset: -1px;
+}
+
+.autocomplete__clear {
+  border-radius: 0;
 }
 
 .autocomplete__button:disabled,

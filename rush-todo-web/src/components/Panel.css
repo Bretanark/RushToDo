@@ -23,6 +23,10 @@
   gap: var(--space-4);
 }
 
+.panel__body > .field--full {
+  grid-column: 1 / -1;
+}
+
 @media (min-width: 48rem) {
   .panel {
     padding: var(--space-5);

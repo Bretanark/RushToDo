@@ -92,7 +92,7 @@ function AutocompleteField({
   return (
     <FieldWrapper error={error} errorId={errorId} htmlFor={inputId} label={label}>
       <div
-        className="autocomplete"
+        className={value === null ? 'autocomplete' : 'autocomplete autocomplete--clearable'}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false)
         }}
@@ -126,6 +126,22 @@ function AutocompleteField({
           type="text"
           value={visibleValue}
         />
+
+        {value !== null && (
+          <button
+            aria-label={`Clear ${label}`}
+            className="autocomplete__button autocomplete__clear"
+            disabled={disabled || loading}
+            onClick={() => {
+              onChange(null)
+              setQuery('')
+              setIsOpen(false)
+            }}
+            type="button"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        )}
 
         <button
           aria-label={isOpen && query === '' ? 'Hide options' : 'Show options'}

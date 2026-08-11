@@ -25,6 +25,8 @@ public class WorkItem : Entity, IDeletableEntity
     public DateOnly? ScheduledDate { get; set; }
     public DateOnly? CompletionDate { get; set; }
     public DateOnly? CancellationDate { get; set; }
+
+    // TODO: WorkItems should not be deletable. Remove IsDeleted and its soft-delete plumbing.
     public bool IsDeleted { get; set; }
 
     public override string GetText() => Title;

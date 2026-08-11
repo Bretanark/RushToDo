@@ -1,0 +1,4 @@
+.text-area-field__input {
+  min-height: 7.5rem;
+  resize: vertical;
+}
