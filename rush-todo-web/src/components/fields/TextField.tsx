@@ -1,6 +1,5 @@
 import { useId } from 'react'
 import FieldWrapper from './FieldWrapper'
-import './TextField.css'
 
 type TextFieldProps = {
   autoComplete?: string
@@ -42,7 +41,7 @@ function TextField({
         aria-invalid={error ? true : undefined}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
-        className="text-field__input"
+        className="field__input"
         id={inputId}
         maxLength={maxLength}
         name={name}
