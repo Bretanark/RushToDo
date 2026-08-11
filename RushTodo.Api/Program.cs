@@ -12,6 +12,8 @@ builder.Services.AddRushTodoApi(connectionString);
 
 var app = builder.Build();
 
+app.UseMiddleware<ApiExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
