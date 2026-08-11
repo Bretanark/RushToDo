@@ -22,13 +22,23 @@ The solution currently contains the Web API, SQL Server database project, unit t
 
 ## Development Setup
 
-Use Visual Studio with:
+Install:
 
-- the **ASP.NET and web development** workload for the API and React tooling;
-- the **Data storage and processing** workload, or SQL Server Data Tools, for `RushTodo.Database.sqlproj` and DACPAC deployment;
+- Visual Studio with the **ASP.NET and web development** workload;
+- Visual Studio's **Data storage and processing** workload, or SQL Server Data Tools, for `RushTodo.Database.sqlproj` and DACPAC deployment;
+- Visual Studio Code for focused React/TypeScript development;
+- Git for Windows so Visual Studio Code and other development tools can access the repository;
 - the .NET SDK selected when the API projects are created;
 - SQL Server/LocalDB available for local development and integration tests;
 - Node.js LTS for the Vite React application.
+
+Git for Windows can be installed with:
+
+```powershell
+winget install --id Git.Git -e --source winget
+```
+
+Close and reopen Visual Studio Code after installing Git so it receives the updated `PATH`.
 
 ReSharper is required to maintain the ReSharper-Green coding standard. The solution-level `RushTodo.sln.DotSettings` and repository `.editorconfig` carry the shared standards. Personal `.DotSettings.user` files are ignored by Git.
 
@@ -37,6 +47,15 @@ The future SQL Project may not build with the plain .NET CLI because it uses SSD
 Integration tests use `RushToDo.Test`, but never publish or reset it automatically. Manually publish `RushTodo.Database/Test.publish.xml` when a blank database is wanted. The local connection string is in `RushTodo.IntegrationTests/appsettings.IntegrationTests.json`; builds may override it with the standard `ConnectionStrings__RushTodo` environment variable. Test setup idempotently inserts any missing deterministic `TestData` records. Tests treat those records as immutable, use CSV containment assertions to tolerate unrelated accumulated data, and create their own records for write scenarios. Keep expected CSV static and omit generated values such as identity IDs, so failed actual CSV can be copied directly over the expected block and reviewed.
 
 Running `RushTodo.Api` with the Development launch profile opens Swagger UI at `/swagger` for interactive API testing.
+
+For the React UI:
+
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
+
+Open `C:\GitHub\RushToDo\rush-todo-web` directly in Visual Studio Code, then run these commands in its integrated terminal. Open the local URL printed by Vite. Use `npm.cmd run lint` and `npm.cmd run build` before handing over UI changes. See `rush-todo-web/REACT-NOTES.md` for the short React/Vite mental model and common commands.
 
 ## Architecture Principles
 
