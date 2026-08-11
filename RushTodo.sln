@@ -6,6 +6,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "RushTodo.Database", "RushTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RushTodo.Api", "RushTodo.Api\RushTodo.Api.csproj", "{8DB94CB3-B38C-4053-921D-9DF246B5A93D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RushTodo.IntegrationTests", "RushTodo.IntegrationTests\RushTodo.IntegrationTests.csproj", "{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{50C720EF-84E3-48E1-A7AA-CDE986FE7F77}"
 	ProjectSection(SolutionItems) = preProject
 		AGENTS.md = AGENTS.md
@@ -35,6 +37,18 @@ Global
 		{8DB94CB3-B38C-4053-921D-9DF246B5A93D}.Release|x64.Build.0 = Release|Any CPU
 		{8DB94CB3-B38C-4053-921D-9DF246B5A93D}.Release|x86.ActiveCfg = Release|Any CPU
 		{8DB94CB3-B38C-4053-921D-9DF246B5A93D}.Release|x86.Build.0 = Release|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Debug|x64.Build.0 = Debug|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Debug|x86.Build.0 = Debug|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Release|x64.ActiveCfg = Release|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Release|x64.Build.0 = Release|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Release|x86.ActiveCfg = Release|Any CPU
+		{F2F8D124-5D07-4F17-87B1-1C2D4D2EE462}.Release|x86.Build.0 = Release|Any CPU
 		{5D342A08-0E14-4E82-BD37-728B574CC9B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5D342A08-0E14-4E82-BD37-728B574CC9B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D342A08-0E14-4E82-BD37-728B574CC9B3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
