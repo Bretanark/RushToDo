@@ -1,17 +1,23 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using RushTodo.Api.Entities;
 using RushTodo.Api.Services;
 
 namespace RushTodo.Api.Repositories;
 
-public class RushTodoDbContext : DbContext
+public class RushTodoDbContext : DbContext, ITransactionService
 {
     private readonly IDateTimeService _dateTimeService;
+    private readonly IUserContext _userContext;
+    private List<Func<Task>>? _afterCommitActions;
+    private IDbContextTransaction? _transaction;
+    private DateTime? _transactionUpdateDateTime;
 
-    public RushTodoDbContext(DbContextOptions<RushTodoDbContext> options, IDateTimeService dateTimeService)
+    public RushTodoDbContext(DbContextOptions<RushTodoDbContext> options, IDateTimeService dateTimeService, IUserContext userContext)
         : base(options)
     {
         _dateTimeService = dateTimeService;
+        _userContext = userContext;
     }
 
     // ReSharper disable UnusedMember.Global
@@ -23,6 +29,60 @@ public class RushTodoDbContext : DbContext
     public DbSet<WorkItem> WorkItems => Set<WorkItem>();
     public DbSet<WorkItemStatus> WorkItemStatuses => Set<WorkItemStatus>();
     // ReSharper restore UnusedMember.Global
+
+    public int AppUserId => _userContext.AppUserId;
+    public DateTime UpdateDateTime => _transactionUpdateDateTime ?? _dateTimeService.UtcNow;
+
+    public Task AfterCommit(Func<Task> action)
+    {
+        if (_afterCommitActions is null) return action();
+
+        _afterCommitActions.Add(action);
+        return Task.CompletedTask;
+    }
+
+    public async Task Run(Func<Task> action)
+    {
+        await Run(async () =>
+        {
+            await action();
+            return true;
+        });
+    }
+
+    public async Task<TResult> Run<TResult>(Func<Task<TResult>> action)
+    {
+        if (_transaction is not null) return await action();
+
+        await using var transaction = await Database.BeginTransactionAsync();
+        _transaction = transaction;
+        _transactionUpdateDateTime = _dateTimeService.UtcNow;
+        _afterCommitActions = [];
+
+        TResult result;
+        Func<Task>[] afterCommitActions;
+        try
+        {
+            result = await action();
+            await transaction.CommitAsync();
+            afterCommitActions = [.. _afterCommitActions];
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+        finally
+        {
+            _transaction = null;
+            _transactionUpdateDateTime = null;
+            _afterCommitActions = null;
+        }
+
+        foreach (var afterCommit in afterCommitActions) await afterCommit();
+
+        return result;
+    }
 
     public override int SaveChanges()
     {
@@ -116,7 +176,7 @@ public class RushTodoDbContext : DbContext
 
     private void ApplyUpdateDateTimes()
     {
-        var updateDateTime = _dateTimeService.UtcNow;
+        var updateDateTime = UpdateDateTime;
         var entries = ChangeTracker.Entries<Entity>()
             .Where(entry => entry.State is EntityState.Added or EntityState.Modified);
 
