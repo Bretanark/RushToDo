@@ -104,7 +104,7 @@ Follow VegiCoop patterns. Create `WorkItemRepository` and `GardenerRepository`; 
 ## WorkItem Search
 
 ```csharp
-public class WorkItemSearch
+public class WorkItemSearchParameters
 {
     public int[]? GardenerIds { get; set; }
     public DateOnly? ScheduledFrom { get; set; }
@@ -115,8 +115,8 @@ public class WorkItemSearch
 ```
 
 ```csharp
-Task<IReadOnlyList<WorkItemModel>> SearchAsync(
-    WorkItemSearch search,
+Task<WorkItemModel[]> Search(
+    WorkItemSearchParameters parameters,
     CancellationToken cancellationToken = default);
 ```
 
@@ -213,7 +213,7 @@ After initial setup, deterministic data need not be recreated every run if alrea
 
 ### Search Integration Tests
 
-Focus on `WorkItemService.SearchAsync`: baseline expected WorkItems, one/multiple Gardeners, statuses, scheduled-date ranges, completed/cancelled as appropriate. Exercise the real service/repository/EF/SQL stack.
+Focus on `WorkItemService.Search`: baseline expected WorkItems, one/multiple Gardeners, statuses, scheduled-date ranges, completed/cancelled as appropriate. Exercise the real service/repository/EF/SQL stack.
 
 ### Create-and-Search Test
 
