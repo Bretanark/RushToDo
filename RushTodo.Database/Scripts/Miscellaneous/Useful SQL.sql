@@ -1,5 +1,5 @@
 -- Set the recent-change window used by the diagnostic queries below.
-DECLARE @Since DATETIME2 = DATEADD(HOUR, -5, SYSUTCDATETIME())
+DECLARE @Since DATETIME2 = DATEADD(HOUR, -1, SYSUTCDATETIME())
 
 -- Show recently changed gardeners.
 SELECT * FROM dbo.Gardener gd WHERE gd.UpdateDateTime > @Since ORDER BY gd.UpdateDateTime DESC

@@ -51,6 +51,7 @@ App
 └── WorkItemEditPage
     └── PageFrame
         └── Panel
+            ├── Button (Save)
             ├── TextField (Title)
             ├── TextField (Address)
             ├── GardenerField
@@ -60,6 +61,10 @@ App
 ```
 
 `WorkItemEditPage` owns the draft WorkItem in `useState`. Each `TextField` is controlled: it receives its current value and reports changes through `onChange`. The page creates a new state object for each change rather than mutating the existing object; React then renders the updated values.
+
+Saving uses `Api.saveWorkItem`, which selects POST or PUT from `workItemId`. The server-returned model becomes both the current edit model and the persisted baseline, retaining its generated ID and concurrency timestamp while disabling Save until another field changes.
+
+Disabled buttons use the shared `Tooltip` host so their explanation remains available by tap, mouse hover or keyboard focus even though the native button itself cannot receive those interactions.
 
 Shared field presentation belongs in `FieldWrapper`; input-specific behaviour belongs in controls such as `TextField`. Base styling is mobile-first: fields use one column and expand to two columns only when enough width is available.
 

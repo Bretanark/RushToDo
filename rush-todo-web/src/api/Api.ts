@@ -1,10 +1,18 @@
-import type { LookupItem } from './models'
+import type { LookupItem, WorkItemModel } from './models'
 
-async function request<T>(url: string): Promise<T> {
+type RequestOptions = {
+  body?: unknown
+  method?: 'GET' | 'POST' | 'PUT'
+}
+
+async function request<T>(url: string, options?: RequestOptions): Promise<T> {
   const response = await fetch(url, {
     headers: {
       Accept: 'application/json',
+      ...(options?.body === undefined ? {} : { 'Content-Type': 'application/json' }),
     },
+    body: options?.body === undefined ? undefined : JSON.stringify(options.body),
+    method: options?.method ?? 'GET',
   })
 
   if (!response.ok) throw new Error(await getErrorMessage(response))
@@ -23,6 +31,13 @@ async function getErrorMessage(response: Response): Promise<string> {
 
 const Api = {
   getGardeners: () => request<LookupItem[]>('/gardener'),
+  saveWorkItem: (workItem: WorkItemModel) =>
+    workItem.workItemId === undefined
+      ? request<WorkItemModel>('/work-item', { body: workItem, method: 'POST' })
+      : request<WorkItemModel>(`/work-item/${workItem.workItemId}`, {
+          body: workItem,
+          method: 'PUT',
+        }),
 }
 
 export default Api
