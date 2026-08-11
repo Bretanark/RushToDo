@@ -30,6 +30,7 @@ public static class CsvAssert
             {new CsvTable(expected.Headers, missingRows).Write()}
             Actual CSV:
             {actualTable.Write()}
+            .
             """);
     }
 

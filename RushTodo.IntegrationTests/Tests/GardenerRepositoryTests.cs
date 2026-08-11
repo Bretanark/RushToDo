@@ -1,19 +1,15 @@
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using RushTodo.Api.Repositories;
 
 namespace RushTodo.IntegrationTests;
 
 [TestFixture]
-public class GardenerRepositoryTests
+public class GardenerRepositoryTests : IntegrationTestBase<IGardenerRepository>
 {
     [Test]
     public async Task ListIncludesTestData()
     {
-        await using var scope = GlobalSetup.Services.CreateAsyncScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IGardenerRepository>();
-
-        var actual = await repository.List();
+        var actual = await Run(repository => repository.List());
 
         const string expected = """
             Id,Name,PhoneNumber,EmailAddress,IsDeleted
