@@ -12,7 +12,7 @@ RushTodo.UnitTests
 RushTodo.IntegrationTests
 ```
 
-The solution currently contains the Web API shell, persisted entities, SQL Server database project, and documentation. Remaining projects will be added one focused increment at a time.
+The solution currently contains the Web API shell with EF Core persistence mapping, persisted entities, SQL Server database project, and documentation. Remaining projects will be added one focused increment at a time.
 
 ## Start Here
 
