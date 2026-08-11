@@ -264,7 +264,7 @@ Treat this as a backlog, **not permission to implement everything immediately**:
 9. Add deterministic integration-test data.
 10. Add integration tests for search and creation.
 11. Add unit tests.
-12. Create React/TypeScript/Bootstrap application.
+12. Create React/TypeScript application with app-owned CSS.
 13. Add React API facade.
 14. Add WorkItem list UI.
 15. Add WorkItem add/edit UI.
@@ -272,6 +272,18 @@ Treat this as a backlog, **not permission to implement everything immediately**:
 17. Add filtering/sorting if useful and time permits.
 18. Add README/interview notes.
 19. Expose the current business date through an API controller backed by `IDateTimeService`, then replace the React client-clock fallback used by the Completed and Cancel Job actions.
+
+### Remaining Production and Customer Backlog
+
+1. Review the working prototype with the customer during the interview. Use concrete behaviour to discover what they actually need, agree priorities and evolve the prototype rather than treating the initial brief as a finished specification.
+2. Review and prioritise TODOs already recorded in the code; resolve or convert them into explicit backlog decisions rather than allowing them to become invisible debt.
+3. Add structured application logging, including useful request, exception and business-operation context without logging sensitive data.
+4. Add UI automation using Selenium and NUnit. Build reusable page and field models that produce readable tests, for example `HomePage.List.Find("Sam").Click()`.
+5. Evolve styling, responsive behaviour and customer branding after customer review establishes the desired product direction.
+6. Add Azure DevOps YAML pipelines for repeatable build, test, packaging and deployment stages.
+7. Add infrastructure as code for the agreed Azure architecture and validate it in the pipeline.
+8. Define independently configured Dev, Test, Demo and Production environments, including environment-specific settings, secrets, databases and deployment controls.
+9. Decide the hosting and packaging model deliberately. If retaining the brief's Kubernetes and Helm requirement, container images are a technical prerequisite. Otherwise, consider a simpler Azure hosting model and document why it offers better engineering economics for this application.
 
 Do not begin the next backlog item until I explicitly ask you to continue.
 
