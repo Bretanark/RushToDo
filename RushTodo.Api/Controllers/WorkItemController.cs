@@ -15,6 +15,15 @@ public class WorkItemController : ControllerBase
         _workItemService = workItemService;
     }
 
+    [HttpGet]
+    [ProducesResponseType<WorkItemModel[]>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<WorkItemModel[]>> Search(
+        [FromQuery] WorkItemSearchParameters parameters,
+        CancellationToken cancellationToken)
+    {
+        return await _workItemService.Search(parameters, cancellationToken);
+    }
+
     [HttpGet("{id:int}")]
     [ProducesResponseType<WorkItemModel>(StatusCodes.Status200OK)]
     public async Task<ActionResult<WorkItemModel>> Get(int id)
